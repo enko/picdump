@@ -1,0 +1,38 @@
+{% extends 'PicdumpBundle::layout.html.twig' %}
+
+{% block javascripts %}
+{% javascripts
+        "@PicdumpBundle/Resources/assets/js/main.js"
+%}
+<script src="{{ asset_url }}"></script>
+{% endjavascripts %}
+{% endblock %}
+
+{% block body -%}
+
+<form enctype="multipart/form-data" class="ui segment form" method="post">
+  <h1 class="ui dividing header">picdump</h1>
+  <p>Upload your images.</p>
+  <p>Supported types are:</p>
+  <div class="ui list">
+    <ul class="list">
+      <li class="item"><i class="circular inverted blue photo icon"></i>JPEG</li>
+      <li class="item"><i class="circular inverted blue photo icon"></i>PNG</li>
+      <li class="item"><i class="circular inverted blue photo icon"></i>GIF</li>
+    </ul> 
+  </div>
+  <p>A maximum of 15 MB are allowed.</p>
+  <div class="field">
+    <div class="ui action input">
+      <input type="text" id="_attachmentName" readonly>
+      <label for="attachmentName" class="ui icon button btn-file">
+        <i class="attachment basic icon"></i>
+        <input required type="file" id="attachmentName" name="attachmentName" style="display: none" accept="image/*">
+      </label>
+    </div>    
+  </div>
+  <input type="submit" class="ui blue button">
+
+</form>
+
+{% endblock %}

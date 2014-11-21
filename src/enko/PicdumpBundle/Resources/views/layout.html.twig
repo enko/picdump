@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>{% block title %}picdump{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Bootstrap -->
+    <link rel="shortcut icon" href="/favicon.png" />
+    <link href='//fonts.googleapis.com/css?family=Roboto:400,700' rel='stylesheet' type='text/css'>
+    {% stylesheets filter="compass"
+        "@PicdumpBundle/Resources/assets/scss/main.scss"
+        "@PicdumpBundle/Resources/assets/scss/semantic.scss"
+    %}
+    <link rel="stylesheet" href="{{ asset_url }}" media="screen" />
+    {% endstylesheets %}
+    {% block css %}
+
+    {% endblock %}
+
+</head>
+
+<body>
+
+<main class="ui one column page grid">
+    <div class="column">
+      {% block body %}no content{% endblock %}
+    </div>
+</main>
+
+<!-- jQuery (necessary for Bootstraps JavaScript plugins) -->
+<script src="{{ asset('javascript/jquery.js') }}"></script>
+<!-- Include all JavaScripts, compiled by Assetic -->
+<script src="{{ asset('javascript/semantic.js') }}"></script>
+{% block javascripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,5 @@
+enko_picdump:
+    resource: "@PicdumpBundle/Controller/"
+    type:     annotation
+    prefix:   /
+
