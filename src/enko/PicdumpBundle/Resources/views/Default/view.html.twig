@@ -11,9 +11,9 @@
 {% block body -%}
 
 <div class="ui segment">
-  <img src="/{{ hash }}_thumb" class="ui medium image" />
+  <img src="/{{ path('image_view_thumb', {'hash' : hash }) }}" class="ui medium image" />
   <br />
-  <a class="ui blue button" href="/{{ hash }}_orig">Download</a>
+  <a class="ui blue button" href="/{{ path('image_view_original', {'hash' : hash }) }}">Download</a>
 </div>
 
 {% endblock %}

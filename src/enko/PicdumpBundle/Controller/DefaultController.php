@@ -75,6 +75,48 @@ class DefaultController extends Controller
     }
 
     /**
+     * Image thumbnail
+     *
+     * @Route("/t/{hash}", name="image_view_thumb")
+     * @Method("GET")
+     */
+    public function viewImageThumbAction($hash)
+    {
+        if ($this->hashExists('thumb', $hash)) {
+            $file = $this->getMediaPath() . '/thumb' . '/' . $hash;
+            if (file_exists($file)) {
+                $response = new Response(file_get_contents($file));
+                $finfo = finfo_open(FILEINFO_MIME_TYPE);
+                $response->headers->set('Content-Type', finfo_file($finfo, $file));
+                finfo_close($finfo);
+                return $response;
+            }
+        }
+        throw $this->createNotFoundException('Image does not exists.');
+    }
+
+    /**
+     * Original image
+     *
+     * @Route("/o/{hash}", name="image_view_original")
+     * @Method("GET")
+     */
+    public function viewImageOriginalAction($hash)
+    {
+        if ($this->hashExists('orig', $hash)) {
+            $file = $this->getMediaPath() . '/orig' . '/' . $hash;
+            if (file_exists($file)) {
+                $response = new Response(file_get_contents($file));
+                $finfo = finfo_open(FILEINFO_MIME_TYPE);
+                $response->headers->set('Content-Type', finfo_file($finfo, $file));
+                finfo_close($finfo);
+                return $response;
+            }
+        }
+        throw $this->createNotFoundException('Image does not exists.');
+    }
+
+    /**
      * Detailpage for an image
      *
      * @Route("/{hash}", name="image_view")
@@ -82,51 +124,11 @@ class DefaultController extends Controller
      * @Template("PicdumpBundle:Default:view.html.twig")
      */
     public function viewImageAction($hash) {
-      if (substr($hash,strlen($hash)-5) == 'thumb') {
-        $hash = substr($hash,0,strlen($hash)-6);
-        if ($this->hashExists('thumb',$hash)) {
-          $file = $this->getMediaPath().'/thumb' . '/' . $hash;
-          if (file_exists($file)) {
-            $response = new Response(file_get_contents($file));
-            $finfo = finfo_open(FILEINFO_MIME_TYPE);
-            $response->headers->set('Content-Type', finfo_file($finfo,$file));
-            finfo_close($finfo);
-            return $response;
-          }
-        }
-        throw $this->createNotFoundException('Image does not exists.');
-      }
-      if (substr($hash,strlen($hash)-4) == 'orig') {
-        $hash = substr($hash,0,strlen($hash)-5);
-        if ($this->hashExists('thumb',$hash)) {
-          $file = $this->getMediaPath().'/orig' . '/' . $hash;
-          if (file_exists($file)) {
-            $response = new Response(file_get_contents($file));
-            $finfo = finfo_open(FILEINFO_MIME_TYPE);
-            $response->headers->set('Content-Type', finfo_file($finfo,$file));
-            finfo_close($finfo);
-            return $response;
-          }
-        }
-        throw $this->createNotFoundException('Image does not exists.');
-      }
       if ($this->hashExists('orig',$hash)) {
         return ['hash' => $hash];
       } else {
         throw $this->createNotFoundException('Image does not exists.');
       }
-    }
-
-    /**
-     * Detailpage for an image
-     *
-     * @Route("/{hash}_thumb", name="image_thumb_view")
-     * @Method("GET")
-     */
-    public function viewThumbImageAction($hash) {
-      die($hash);
-
-
     }
 
 }
