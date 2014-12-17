@@ -25,7 +25,7 @@ class DefaultController extends Controller
     }
 
     private function getHash($filename) {
-      return hash_file('sha256',$filename);
+      return base64_encode(hash_file('ripemd160',$filename,true));
     }
 
     private function getMediaPath() {
