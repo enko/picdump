@@ -1,19 +1,61 @@
 {% extends 'PicdumpBundle::layout.html.twig' %}
 
 {% block javascripts %}
-{% javascripts
-        "@PicdumpBundle/Resources/assets/js/main.js"
-%}
+    {% javascripts
+    "@PicdumpBundle/Resources/assets/js/main.js" %}
 <script src="{{ asset_url }}"></script>
-{% endjavascripts %}
+    {% endjavascripts %}
+    {% if mimetype == 'application/pdf' %}
+        {% javascripts
+        "@PicdumpBundle/Resources/assets/js/pdf.worker.js"
+        "@PicdumpBundle/Resources/assets/js/pdf.js" %}
+<script src="{{ asset_url }}"></script>
+        {% endjavascripts %}
+        {% javascripts "@PicdumpBundle/Resources/assets/js/pdf.worker.js" %}
+        <script>
+            PDFJS.workerSrc = '{{ asset_url }}';
+        </script>
+        {% endjavascripts %}
+        <script>
+            $(document).ready(function(){
+                PDFJS.getDocument('{{ path('image_view_original', {'hash' : hash }) }}').then(function(pdf) {
+                    // Using promise to fetch the page
+                    pdf.getPage(1).then(function(page) {
+                        var scale = 1.5;
+                        var viewport = page.getViewport(scale);
+                        //
+                        // Prepare canvas using PDF page dimensions
+                        //
+                        var canvas = document.getElementById('pdf');
+                        var context = canvas.getContext('2d');
+                        canvas.height = viewport.height;
+                        canvas.width = viewport.width;
+                        //
+                        // Render PDF page into canvas context
+                        //
+                        var renderContext = {
+                            canvasContext: context,
+                            viewport: viewport
+                        };
+                        page.render(renderContext);
+                    });
+                });
+            });
+        </script>
+    {% endif %}
 {% endblock %}
 
 {% block body -%}
 
-<div class="ui segment">
-  <img src="{{ path('image_view_thumb', {'hash' : hash }) }}" class="ui medium image" />
-  <br />
-  <a class="ui blue button" href="{{ path('image_view_original', {'hash' : hash }) }}">Download</a>
-</div>
+    <div class="ui segment">
+        {% if mimetype == 'application/pdf' %}
+            <div id="pdf-container">
+                <canvas id="pdf" />
+            </div>
+        {% else %}
+            <img src="{{ path('image_view_thumb', {'hash' : hash }) }}" class="ui medium image"/>
+        {% endif %}
+        <a class="ui blue button" href="{{ path('image_view_original', {'hash' : hash }) }}">Download</a>
+    </div>
 
 {% endblock %}

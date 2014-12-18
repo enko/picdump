@@ -130,7 +130,11 @@ class DefaultController extends Controller
     public function viewImageAction($hash)
     {
         if ($this->hashExists('orig', $hash)) {
-            return ['hash' => $hash];
+            $file = $this->getMediaPath() . '/orig' . '/' . $hash;
+            $finfo = finfo_open(FILEINFO_MIME_TYPE);
+            $mimtype = finfo_file($finfo, $file);
+            finfo_close($finfo);
+            return ['hash' => $hash,'mimetype' => $mimtype];
         } else {
             throw $this->createNotFoundException('Image does not exists.');
         }
