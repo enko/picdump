@@ -24,22 +24,26 @@ class DefaultController extends Controller
         return [];
     }
 
-    private function getHash($filename) {
-      return str_replace('/','-',base64_encode(hash_file('ripemd160',$filename,true)));
+    private function getHash($filename)
+    {
+        return str_replace('/', '-', base64_encode(hash_file('ripemd160', $filename, true)));
     }
 
-    private function getMediaPath() {
-      return realpath(dirname(__FILE__).'/../../../../media');
+    private function getMediaPath()
+    {
+        return realpath(dirname(__FILE__) . '/../../../../media');
     }
 
-    private function imageExists($filename) {
-      $orig_path = realpath($this->getMediaPath().'/orig');
-      return file_exists($orig_path . '/' . $this->getHash($filename));
+    private function imageExists($filename)
+    {
+        $orig_path = realpath($this->getMediaPath() . '/orig');
+        return file_exists($orig_path . '/' . $this->getHash($filename));
     }
 
-    private function hashExists($store,$hash) {
-      $dir = realpath($this->getMediaPath().'/'.$store);
-      return file_exists($dir . '/' . $hash);
+    private function hashExists($store, $hash)
+    {
+        $dir = realpath($this->getMediaPath() . '/' . $store);
+        return file_exists($dir . '/' . $hash);
     }
 
     /**
@@ -51,27 +55,27 @@ class DefaultController extends Controller
      */
     public function handleUploadAction()
     {
-      foreach($_FILES as $file) {
-        if($file['size'] > 15 * 1024 * 1024) {
-          return ['error' => 'Maximum file size is 15 MB'];
+        foreach ($_FILES as $file) {
+            if ($file['size'] > 15 * 1024 * 1024) {
+                return ['error' => 'Maximum file size is 15 MB'];
+            }
+            $hash = $this->getHash($file['tmp_name']);
+            if ($this->imageExists($file['tmp_name'])) {
+                return $this->redirect($this->generateUrl('image_view', array('hash' => $this->getHash($file['tmp_name']))));
+            }
+            $filename = realpath($this->getMediaPath() . '/orig') . '/' . $hash;
+            if (move_uploaded_file($file['tmp_name'], $filename)) {
+                // generate a thumbnail
+                $imagine = new Imagine\Imagick\Imagine();
+                $size = new Imagine\Image\Box(512, 512);
+                $mode = Imagine\Image\ImageInterface::THUMBNAIL_INSET;
+                $thumb = realpath($this->getMediaPath() . '/thumb') . '/' . $hash;
+                $imagine->open($filename)
+                    ->thumbnail($size, $mode)
+                    ->save($thumb);
+                return $this->redirect($this->generateUrl('image_view', array('hash' => $hash)));
+            }
         }
-        $hash = $this->getHash($file['tmp_name']);
-        if ($this->imageExists($file['tmp_name'])) {
-          return $this->redirect($this->generateUrl('image_view', array('hash' => $this->getHash($file['tmp_name']))));
-        }
-        $filename = realpath($this->getMediaPath().'/orig') . '/' . $hash;
-        if (move_uploaded_file($file['tmp_name'], $filename)) {
-          // generate a thumbnail
-          $imagine = new Imagine\Imagick\Imagine();
-          $size    = new Imagine\Image\Box(512, 512);
-          $mode    = Imagine\Image\ImageInterface::THUMBNAIL_INSET;
-          $thumb = realpath($this->getMediaPath().'/thumb') . '/' . $hash;
-          $imagine->open($filename)
-            ->thumbnail($size, $mode)
-            ->save($thumb);
-          return $this->redirect($this->generateUrl('image_view', array('hash' => $hash)));
-        }
-      }
     }
 
     /**
@@ -123,12 +127,13 @@ class DefaultController extends Controller
      * @Method("GET")
      * @Template("PicdumpBundle:Default:view.html.twig")
      */
-    public function viewImageAction($hash) {
-      if ($this->hashExists('orig',$hash)) {
-        return ['hash' => $hash];
-      } else {
-        throw $this->createNotFoundException('Image does not exists.');
-      }
+    public function viewImageAction($hash)
+    {
+        if ($this->hashExists('orig', $hash)) {
+            return ['hash' => $hash];
+        } else {
+            throw $this->createNotFoundException('Image does not exists.');
+        }
     }
 
 }
